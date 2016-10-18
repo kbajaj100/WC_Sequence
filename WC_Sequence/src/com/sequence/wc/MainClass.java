@@ -22,7 +22,15 @@ public class MainClass {
 
 		max = myDB.getmax();
 	
+		//myDB.createclaimlist();
+		
+		//myDB.createDXlist(max);
+		
 		System.out.println(max);
+		
+		//myDB.markedClaims();
+		
+		//myDB.destroyclaimlist();
 	}
 
 }
