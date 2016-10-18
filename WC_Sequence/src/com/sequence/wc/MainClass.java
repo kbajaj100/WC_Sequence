@@ -28,7 +28,7 @@ public class MainClass {
 		
 		System.out.println(max);
 		
-		//myDB.markedClaims();
+		myDB.markedClaims();
 		
 		//myDB.destroyclaimlist();
 	}

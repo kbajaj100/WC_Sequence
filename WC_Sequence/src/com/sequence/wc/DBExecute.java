@@ -16,6 +16,8 @@ public class DBExecute {
 	private String Table_Write = "";
 	private String Table_Read = "";
 	private int Marked = 0;
+	private int Num_WC_Codes;
+	private int Num_NonWC_Codes;
 	
 	public int getmax() throws FileNotFoundException, IOException, SQLException {
 		// TODO Auto-generated method stub
@@ -83,23 +85,30 @@ public class DBExecute {
 			
 		SQL = "update " + Table_Write + " " + 
 			  "set Sequence = '" + Sequence + "' " + 
+			  ", Marked = " + Marked + " " +
+			  ", Num_Codes = " + Num_NonWC_Codes + " " +
+			  ", Num_WC_Codes = " + Num_WC_Codes + " " +
 			  "where Claim_ID = " + claim_id;
 		
 		System.out.println(SQL);
 		
 		myconn.execSQL(SQL);
 		
+		/*SQL = "update " + Table_Write + " " + 
+			  "set Sequence = '" + Sequence + "' " + 
+			  "where Claim_ID = " + claim_id;
+		
+		
 		SQL = "update " + Table_Write + " " + 
 				  "set Marked = " + Marked + " " + 
 				  "where Claim_ID = " + claim_id;
 			
 		myconn.execSQL(SQL);
+		*/
 		
 	}
 
 	private void getDXSequence(int claim_id) {
-		// TODO Auto-generated method stub
-		
 		/*
 		 * Get the union of the list of DX from Dx1-4 in alphabetical order for L and M codes
 		 * Get the union of the list of DX from Dx1-4 in alphabetical order for non-L and M codes
@@ -122,34 +131,35 @@ public class DBExecute {
 
 		Sequence = "";
 		Marked = 0;
+		Num_WC_Codes = 0;
 		
 		SQL = "select a11.DX " + 
 			  "from " + 
 			  "( " + 
 			  "select DX1 DX " + 
 			  "from  " + Table_Read + " i1 " + 
-			  "where i1.Claim_ID = " +  claim_id + 
+			  "where i1.Claim_ID = " +  claim_id + " " +
 			  "and i1.DX1 not like 'NULL' and i1.DX1 not like ' ' " + 
 			  "and " +
 			  "(i1.DX1 like 'L%' or i1.DX1 like 'M%') " + 
 			  "union " + 
 			  "select DX2 " + 
 			  "from  " + Table_Read + " i1 " + 
-			  "where i1.Claim_ID = " + claim_id +  
+			  "where i1.Claim_ID = " + claim_id + " " +  
 			  "and i1.DX2 not like 'NULL' and i1.DX2 not like ' ' " +
 			  "and " +  
 			  "(i1.DX2 like 'L%' or i1.DX2 like 'M%') " + 
 			  "union " + 
 			  "select DX3 " + 
 			  "from  " + Table_Read + " i1 " + 
-			  "where i1.Claim_ID = " + claim_id +
+			  "where i1.Claim_ID = " + claim_id + " " +
 			  "and i1.DX3 not like 'NULL' and i1.DX3 not like ' ' " +
 			  "and " +  
 			  "(i1.DX3 like 'L%' or i1.DX3 like 'M%') " +
 			  "union " + 
 			  "select DX4 " + 
 			  "from  " + Table_Read + " i1 " + 
-			  "where i1.Claim_ID = " + claim_id +
+			  "where i1.Claim_ID = " + claim_id + " " +
 			  "and i1.DX4 not like 'NULL' and i1.DX4 not like ' ' " + 
 			  "and " +
 			  "(i1.DX4 like 'L%' or i1.DX4 like 'M%') " + 
@@ -165,6 +175,8 @@ public class DBExecute {
 	    	crs = myconn.getRowSet();
 
 	    	while (crs.next()) {
+	    		
+	    		++Num_WC_Codes;
 	    		if (Sequence.length() == 0)
 	    				Sequence = crs.getString(1);
 	    		else 
@@ -186,39 +198,42 @@ public class DBExecute {
 		// TODO Auto-generated method stub
 		
 		Sequence_nonWC = "";
+		Num_NonWC_Codes = 0;
 		
 		SQL = "select a11.DX " + 
 			  "from " + 
 			  "( " + 
 			  "select DX1 DX " + 
 			  "from  " + Table_Read + " i1 " + 
-			  "where i1.Claim_ID = " +  claim_id + 
+			  "where i1.Claim_ID = " +  claim_id + " " + 
 			  "and i1.DX1 not like 'NULL' and i1.DX1 not like ' ' " +
 			  "and " +
 			  "(i1.DX1 not like 'L%' and i1.DX1 not like 'M%') " + 
 			  "union " + 
 			  "select DX2 " + 
 			  "from  " + Table_Read + " i1 " + 
-			  "where i1.Claim_ID = " + claim_id +  
+			  "where i1.Claim_ID = " + claim_id + " " +  
 			  "and i1.DX2 not like 'NULL' and i1.DX2 not like ' ' " + 
 			  "and " +  
 			  "(i1.DX2 not like 'L%' and i1.DX2 not like 'M%') " + 
 			  "union " + 
 			  "select DX3 " + 
 			  "from  " + Table_Read + " i1 " + 
-			  "where i1.Claim_ID = " + claim_id +
+			  "where i1.Claim_ID = " + claim_id + " " +
 			  "and i1.DX3 not like 'NULL' and i1.DX3 not like ' ' " +
 			  "and " +  
 			  "(i1.DX3 not like 'L%' and i1.DX3 not like 'M%') " +
 			  "union " + 
 			  "select DX4 " + 
 			  "from  " + Table_Read + " i1 " + 
-			  "where i1.Claim_ID = " + claim_id +
+			  "where i1.Claim_ID = " + claim_id + " " +
 			  "and i1.DX4 not like 'NULL' and i1.DX4 not like ' ' " +
 			  "and " +
 			  "(i1.DX4 not like 'L%' and i1.DX4 not like 'M%') " + 
 			  ") a11 " + 
 			  "order by a11.DX";
+		
+		System.out.println(SQL);
 		
 		if(!myconn.execSQL_crs(SQL))
 			System.exit(1);
@@ -229,13 +244,15 @@ public class DBExecute {
 	    	crs = myconn.getRowSet();
 
 	    	while (crs.next()) {
+	    		++Num_NonWC_Codes;
 	    		if (Sequence_nonWC.length() == 0)
 	    				Sequence_nonWC = crs.getString(1);
 	    		else 
 	    			Sequence_nonWC = Sequence_nonWC + "->" + crs.getString(1);
 	    		
 	    		System.out.println("Sequence_nonWC: " + Sequence_nonWC);
-    	
+	    		
+	    		
 	    	}
 	    } catch (SQLException se){
 	    	se.printStackTrace();
@@ -254,8 +271,121 @@ public class DBExecute {
 	public void markedClaims() {
 		// TODO Auto-generated method stub
 		
+		int claim_id;
+		int count_claims;
 		
+		Table_Write = "rcmods.claims_physician_sequence_wc ";
+		Table_Read =  "rcmods.claims_physician_sequence ";
+		
+		SQL = "select count(distinct Claim_ID) count " +
+				  "from " + Table_Read + 
+				  "where Marked = 1 and Num_Codes > 0";
+
+		count_claims = myconn.execSQL_returnint(SQL);
+		System.out.println(count_claims);
+		
+		SQL = "select distinct Claim_ID, Sequence, Num_Codes, Num_WC_Codes " +
+			  "from " + Table_Read + 
+			  "where Marked = 1 and Num_Codes > 0";
+	
+		System.out.println(SQL);
+
+		if(!myconn.execSQL_crs(SQL))
+			System.exit(1);
+
+	    try {
+
+	    	CachedRowSetImpl crs1 = new CachedRowSetImpl();
+	    	crs1 = myconn.getRowSet();
+
+	    	while (crs1.next()) {
+	    		
+				claim_id = crs1.getInt(1);
+	    		Sequence = crs1.getString(2);
+				Num_NonWC_Codes = crs1.getInt(3);
+				Num_WC_Codes = crs1.getInt(4);
+						
+	    		SplitSequence(claim_id);
+				
+	    	}
+	    } catch (SQLException se){
+	    	se.printStackTrace();
+	    }
 		
 	}
-	
+
+	private void SplitSequence(int claim_id) {
+		// TODO Auto-generated method stub
+		
+		Table_Read = "rcmods.claims_physician ";
+		getDXSequence_NonWC(claim_id);
+		
+		System.out.println(Sequence_nonWC);
+			
+		String Code;
+		
+		SQL = "select a11.DX " + 
+			  "from " + 
+			  "( " + 
+			  "select DX1 DX " + 
+			  "from  " + Table_Read + " i1 " + 
+			  "where i1.Claim_ID = " +  claim_id + " " +
+			  "and i1.DX1 not like 'NULL' and i1.DX1 not like ' ' " + 
+			  "and " +
+			  "(i1.DX1 like 'L%' or i1.DX1 like 'M%') " + 
+			  "union " + 
+			  "select DX2 " + 
+			  "from  " + Table_Read + " i1 " + 
+			  "where i1.Claim_ID = " + claim_id + " " + 
+			  "and i1.DX2 not like 'NULL' and i1.DX2 not like ' ' " +
+			  "and " +  
+			  "(i1.DX2 like 'L%' or i1.DX2 like 'M%') " + 
+			  "union " + 
+			  "select DX3 " + 
+			  "from  " + Table_Read + " i1 " + 
+			  "where i1.Claim_ID = " + claim_id + " " +
+			  "and i1.DX3 not like 'NULL' and i1.DX3 not like ' ' " +
+			  "and " +  
+			  "(i1.DX3 like 'L%' or i1.DX3 like 'M%') " +
+			  "union " + 
+			  "select DX4 " + 
+			  "from  " + Table_Read + " i1 " + 
+			  "where i1.Claim_ID = " + claim_id + " " +
+			  "and i1.DX4 not like 'NULL' and i1.DX4 not like ' ' " + 
+			  "and " +
+			  "(i1.DX4 like 'L%' or i1.DX4 like 'M%') " + 
+			  ") a11 " + 
+			  "order by a11.DX";
+		
+		System.out.println(SQL);
+		if(!myconn.execSQL_crs(SQL))
+			System.exit(1);
+			
+		    try {
+
+		    	CachedRowSetImpl crs2 = new CachedRowSetImpl();
+		    	crs2 = myconn.getRowSet();
+
+		    	while (crs2.next()) {
+		    		
+		    		Code = crs2.getString(1);
+		    		
+		    		Sequence = Code + "->" + Sequence_nonWC;
+		    		
+		    		SQL = "insert into " + Table_Write + " " + 
+		    			  "(Claim_ID, Sequence) " + 
+		    			  "values(" + claim_id + ", '" + Sequence + "')";
+		    		
+		    		System.out.println(SQL);
+		    		
+		    		myconn.execSQL(SQL);
+		    	}
+		    } catch (SQLException se){
+		    	se.printStackTrace();
+		    }	
+			
+	}
+		
 }
+	
+
