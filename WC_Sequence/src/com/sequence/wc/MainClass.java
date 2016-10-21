@@ -22,15 +22,20 @@ public class MainClass {
 
 		max = myDB.getmax();
 	
+		// Creates sequences for the DXs
 		//myDB.createclaimlist();
 		
 		//myDB.createDXlist(max);
 		
 		System.out.println(max);
 		
-		myDB.markedClaims();
+		// For claims with multiple WC codes, splits the sequences
+		//myDB.markedClaims();
 		
 		//myDB.destroyclaimlist();
+		
+		// Creates sequences based on the DX Groups 
+		myDB.createDXGroup();
 	}
 
 }
