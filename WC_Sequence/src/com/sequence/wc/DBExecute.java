@@ -663,13 +663,14 @@ public class DBExecute {
 		Table_Write = "rcmods.claims_physician_sequence_analysis";
 		
 		SQL = 	"insert into " + Table_Write + " " +  
-				"(Patient_ID, Claim_ID, Provider_ID, Min_dos, Max_dos, Datediff_dos) " + 
+				"(Patient_ID, Claim_ID, Provider_ID, Min_dos, Max_dos, Datediff_dos, Code) " + 
 				"(select distinct q11.Patient_ID, " + 
 				"q12.Claim_ID, " + 
 			  	"q12.Provider_ID, " + 
 			  	"q11.Min_dos, " + 
 				"q11.Max_dos, " + 
-				"q11.Datediff_dos " + 
+				"q11.Datediff_dos, '" + 
+				code + "' " + 
 				"from " + 
 				"(select o11.Patient_ID " + 
 				",min(o11.Service_Date) Min_dos " + 
