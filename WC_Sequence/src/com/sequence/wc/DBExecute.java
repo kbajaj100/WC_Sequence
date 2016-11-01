@@ -638,5 +638,130 @@ public class DBExecute {
 	    }
 	
 	}
+
+	public void getsequenceDatediff() {
+		// TODO Auto-generated method stub
+		
+		String Code;
+		
+		createWC_CodeList();
+		max = getWC_Codecount();
+		
+		System.out.println(max);
+		
+		for (int i = 1; i <= max; ++i)
+		{
+			Code = getcode(i);
+			createWC_SequencePatientList(Code);
+		}
+
+	}
+
+	private void createWC_SequencePatientList(String code) {
+		// TODO Auto-generated method stub
+		
+		Table_Write = "rcmods.claims_physician_sequence_analysis";
+		
+		SQL = 	"insert into " + Table_Write + " " +  
+				"(Patient_ID, Claim_ID, Provider_ID, Min_dos, Max_dos, Datediff_dos) " + 
+				"(select distinct q11.Patient_ID, " + 
+				"q12.Claim_ID, " + 
+			  	"q12.Provider_ID, " + 
+			  	"q11.Min_dos, " + 
+				"q11.Max_dos, " + 
+				"q11.Datediff_dos " + 
+				"from " + 
+				"(select o11.Patient_ID " + 
+				",min(o11.Service_Date) Min_dos " + 
+				",max(o11.Service_Date) Max_dos " + 
+				",DATEDIFF(DD,min(o11.Service_Date), max(o11.Service_Date)) Datediff_dos " + 
+				"from " +  
+				"( "+ 
+				"select distinct a12.Patient_ID " + 
+				", a11.Claim_ID " + 
+				", a11.Sequence " + 
+				", a12.Service_Date " + 
+				"from rcmods.claims_physician_sequence a11 " + 
+				"join rcmods.claims_physician a12 on " + 
+				"(a11.Claim_ID = a12.Claim_ID) " + 
+				"where Sequence like '%" + code + "%'" + 
+				") o11 " + 
+				"group by o11.Patient_ID " + 
+				") q11 " + 
+				"join rcmods.claims_physician  q12 on " + 
+				"(q11.Patient_ID = q12.Patient_ID and " + 
+				"q11.Min_dos = q12.Service_Date)) "; 
+		
+		System.out.println(SQL);
+		myconn.execSQL(SQL);
+
+	}
+
+	private String getcode(int i) {
+		// TODO Auto-generated method stub
+		
+		Table_Write = "rcmods.temp_wc_codes";
+		SQL = " select WC_DX code from " + Table_Write + " where Table_ID = " + i;
+		System.out.println(SQL);
+		Sequence = myconn.execSQL_returnString(SQL);
+		
+		return Sequence;
+	}
+
+	private int getWC_Codecount() {
+		// TODO Auto-generated method stub
+		
+		SQL = "select count(WC_DX) count from " + Table_Write;
+		System.out.println(SQL);
+		
+		max = myconn.execSQL_returnint(SQL);
+		return max;
+	}
+
+	private void createWC_CodeList() {
+		// TODO Auto-generated method stub
+		
+		Table_Read = "rcmods.claims_physician";
+		Table_Write = "rcmods.temp_wc_codes";
+		
+		SQL = "truncate table " + Table_Write;
+
+		myconn.execSQL(SQL);
+		
+		SQL = "insert into " + Table_Write + 
+		" (WC_DX) " +
+		" (select distinct a11.DX1 " +  
+		"from " +   
+		"(" + 
+		"select distinct DX1 " +
+		"from " +  Table_Read + " " + 
+		"where DX1 like 'L%' " + 
+		"or " +
+		"DX1 like 'M%' " + 
+		"union " + 
+		"select distinct DX2 " + 
+		"from " +  Table_Read + " " + 
+		"where DX2 like 'L%' " + 
+		"or " +  
+		"DX2 like 'M%' " + 
+		"union " + 
+		"select distinct DX3 " + 
+		"from " +  Table_Read + " " + 
+		"where " +  
+		"DX3 like 'L%' " + 
+		"or " +  
+		"DX3 like 'M%' " + 
+		"union " + 
+		"select distinct DX4 " + 
+		"from " +  Table_Read + " " + 
+		"where DX4 like 'L%' " + 
+		"or " +  
+		"DX4 like 'M%' " + 
+		") a11 )"; 
+		//"order by a11.DX1 ";
+		
+		System.out.println(SQL);
+		myconn.execSQL(SQL);
+	}
 	
 }

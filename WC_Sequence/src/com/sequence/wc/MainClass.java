@@ -30,12 +30,14 @@ public class MainClass {
 		System.out.println(max);
 		
 		// For claims with multiple WC codes, splits the sequences
-		myDB.markedClaims();
+		//myDB.markedClaims();
 		
 		//myDB.destroyclaimlist();
 		
 		// Creates sequences based on the DX Groups 
 		//myDB.createDXGroup();
+		
+		myDB.getsequenceDatediff();
 	}
 
 }
