@@ -651,10 +651,29 @@ public class DBExecute {
 		
 		for (int i = 1; i <= max; ++i)
 		{
-			Code = getcode(i);
+			Code = getcode(i); // get each code from the wound care code list
 			createWC_SequencePatientList(Code);
 		}
 
+		setminClaim_ID_and_Provider();
+	}
+
+	private void setminClaim_ID_and_Provider() {
+		// TODO Auto-generated method stub
+		
+		SQL = "update a11 " + 
+			  "set a11.Claim_ID = a12.Claim_ID " + 
+			  ",a11.Provider_ID = a12.Provider_ID " + 
+			  "from rcmods.claims_physician_sequence_analysis a11 " + 
+			  "join rcmods.claims_physician a12 on " + 
+			  "(a11.Patient_ID = a12.Patient_ID and " + 
+			  "a11.min_dos = a12.Service_Date) " + 
+			  "where a12.DX1 = a11.code " + 
+			  "or a12.DX2 = a11.code " + 
+			  "or a12.DX3 = a11.code " + 
+			  "or a12.DX4 = a11.code";
+		
+		myconn.execSQL(SQL);
 	}
 
 	private void createWC_SequencePatientList(String code) {
@@ -663,10 +682,11 @@ public class DBExecute {
 		Table_Write = "rcmods.claims_physician_sequence_analysis";
 		
 		SQL = 	"insert into " + Table_Write + " " +  
-				"(Patient_ID, Claim_ID, Provider_ID, Min_dos, Max_dos, Datediff_dos, Code) " + 
+				"(Patient_ID, " + //Claim_ID, Provider_ID, 
+				"Min_dos, Max_dos, Datediff_dos, Code) " + 
 				"(select distinct q11.Patient_ID, " + 
-				"q12.Claim_ID, " + 
-			  	"q12.Provider_ID, " + 
+				//"q12.Claim_ID, " + 
+			  	//"q12.Provider_ID, " + 
 			  	"q11.Min_dos, " + 
 				"q11.Max_dos, " + 
 				"q11.Datediff_dos, '" + 
@@ -686,12 +706,12 @@ public class DBExecute {
 				"join rcmods.claims_physician a12 on " + 
 				"(a11.Claim_ID = a12.Claim_ID) " + 
 				"where Sequence like '%" + code + "%'" + 
-				") o11 " + 
+				") o11 " + // Inner query o11 gets Patient IDs for the claims where the code occurs in the sequence
 				"group by o11.Patient_ID " + 
-				") q11 " + 
+				") q11 " + // For each Patient_ID, gets the min and max date and datediff from the claim list in o11
 				"join rcmods.claims_physician  q12 on " + 
 				"(q11.Patient_ID = q12.Patient_ID and " + 
-				"q11.Min_dos = q12.Service_Date)) "; 
+				"q11.Min_dos = q12.Service_Date)) "; //
 		
 		System.out.println(SQL);
 		myconn.execSQL(SQL);
@@ -720,7 +740,7 @@ public class DBExecute {
 	}
 
 	private void createWC_CodeList() {
-		// TODO Auto-generated method stub
+		// Create list of Wound care codes
 		
 		Table_Read = "rcmods.claims_physician";
 		Table_Write = "rcmods.temp_wc_codes";
