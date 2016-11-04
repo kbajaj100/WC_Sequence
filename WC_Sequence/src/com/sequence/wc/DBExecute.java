@@ -784,5 +784,105 @@ public class DBExecute {
 		System.out.println(SQL);
 		myconn.execSQL(SQL);
 	}
+
+	public void modifySequences_WC() {
+		/*
+			1. For each code search the Sequence table and get the TABLE_IDs where the code is present
+			2. Create a new Sequence with the Replacement 
+			3. Create a new Sequence_Grp with the Replacement
+		*/
+		
+		Table_Write = "rcmods.temp_wc_codes";
+		
+		max = getWC_Codecount();
+		
+		String Read = "rcmods.wc_code_map";
+		String Write = "rcmods.claims_physician_sequence";
+		
+		for(int i = 1; i <= max; ++i){
+			getcode_and_replace(i, Read, Write);	//This method will call the update method		
+		}
+		
+	}
+
+	private void getcode_and_replace(int i, String Read, String Write) {
+		// TODO Auto-generated method stub
+
+		Table_Read = Read;
+		Table_Write = Write;
+		
+		
+		SQL = "select WC_DX, Corresponding_Code " +
+			  "from  " + Table_Read + " " +
+			  "where Table_ID = " + i;
+		
+		if(!myconn.execSQL_crs(SQL))
+			System.exit(1);
+		
+	    try {
+
+	    	CachedRowSetImpl crs = new CachedRowSetImpl();
+	    	crs = myconn.getRowSet();
+
+	    	while (crs.next()) {
+	    		
+	    		if (crs.getString(1) != crs.getString(2))
+	    		{
+	    			System.out.println("Code: " + crs.getString(1));
+	    			System.out.println("Code_replace: " + crs.getString(2));
+	    			
+	    			updateSequence_wc(crs.getString(1), crs.getString(2), 1);
+	    			updateSequence_wc(crs.getString(1), crs.getString(2), 2);
+	    		}
+	    		
+	    	}
+	    } catch (SQLException se){
+	    	se.printStackTrace();
+	    }
+		
+	}
+
+	private void updateSequence_wc(String code, String replace, int uptype) {
+		
+		String update_column, base_column;
+		
+		if(uptype == 1)
+		{	
+			update_column = "Sequence_mod";
+			base_column = "Sequence";
+		}	
+		else 
+		{	
+			update_column = "Sequence_Grp_mod";
+			base_column = "Sequence_Grp";
+		}	
+		
+		SQL = "update " + Table_Write + " " + 
+			  "set Sequence_mod_mark = (case when " + update_column + " is null then 1 else 2 end), " + 
+			  update_column + " = " +
+			  "case " +  
+			  "when " + update_column + " is null then REPLACE(" + base_column + ", '" + code + "', '" + replace + "') " + 
+			  "else REPLACE(" + update_column + ", '" + code + "', '" + replace + "') " +
+			  "end";
+		
+		System.out.println(SQL);
+		
+		myconn.execSQL(SQL);
+		
+	}
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

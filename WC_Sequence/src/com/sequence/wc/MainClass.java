@@ -37,7 +37,10 @@ public class MainClass {
 		// Creates sequences based on the DX Groups 
 		//myDB.createDXGroup();
 		
-		myDB.getsequenceDatediff();
+		//myDB.getsequenceDatediff();
+		
+		myDB.modifySequences_WC();
+		
 	}
 
 }
