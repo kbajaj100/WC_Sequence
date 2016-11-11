@@ -288,7 +288,7 @@ public class DBExecute {
 	}
 
 	public void markedClaims() {
-		// TODO Auto-generated method stub
+		// Get the claims that have multiple wound codes in their sequence
 		
 		int claim_id;
 		int count_claims;
@@ -404,7 +404,13 @@ public class DBExecute {
 		    	}
 		    } catch (SQLException se){
 		    	se.printStackTrace();
-		    }	
+		    }
+		    
+		SQL = "update " + Table_Write + " " +  
+			  "set Code = " +  
+			  "SUBSTRING(Sequence, 1, case when CHARINDEX('->', Sequence,1) = 0 then len(Sequence) else (CHARINDEX('->', Sequence,1)-1) end)";	    
+
+		myconn.execSQL(SQL);
 			
 	}
 
@@ -418,7 +424,6 @@ public class DBExecute {
 		createDXlist(max, 1);
 			
 	}
-
 	
 	private void getDXSequence_Grp(int claim_id) {
 		
@@ -715,7 +720,8 @@ public class DBExecute {
 		
 		System.out.println(SQL);
 		myconn.execSQL(SQL);
-
+		
+		
 	}
 
 	private String getcode(int i) {
@@ -872,17 +878,3 @@ public class DBExecute {
 	}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

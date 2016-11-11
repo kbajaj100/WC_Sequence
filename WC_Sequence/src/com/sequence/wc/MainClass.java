@@ -30,7 +30,7 @@ public class MainClass {
 		System.out.println(max);
 		
 		// For claims with multiple WC codes, splits the sequences
-		//myDB.markedClaims();
+		myDB.markedClaims();
 		
 		//myDB.destroyclaimlist();
 		
@@ -39,7 +39,7 @@ public class MainClass {
 		
 		//myDB.getsequenceDatediff();
 		
-		myDB.modifySequences_WC();
+		//myDB.modifySequences_WC();
 		
 	}
 
